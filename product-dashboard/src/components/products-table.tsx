@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Table,
@@ -10,7 +11,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 
 interface Product {
   id: number;
@@ -31,6 +39,8 @@ interface ProductsResponse {
   skip: number;
   limit: number;
 }
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 async function fetchProducts(): Promise<ProductsResponse> {
   const response = await fetch("/api/products");
@@ -72,6 +82,9 @@ function TableSkeleton() {
 }
 
 export function ProductsTable() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
@@ -89,64 +102,147 @@ export function ProductsTable() {
     );
   }
 
+  const products = data?.products ?? [];
+  const totalItems = products.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  // Calculate pagination indices
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedProducts = products.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>ID</TableHead>
-          <TableHead>Product</TableHead>
-          <TableHead>Brand</TableHead>
-          <TableHead>Category</TableHead>
-          <TableHead className="text-right">Price</TableHead>
-          <TableHead className="text-right">Stock</TableHead>
-          <TableHead className="text-right">Rating</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data?.products.map((product) => (
-          <TableRow key={product.id}>
-            <TableCell className="font-medium">{product.id}</TableCell>
-            <TableCell>
-              <div className="flex items-center gap-3">
-                <img
-                  src={product.thumbnail}
-                  alt={product.title}
-                  className="h-10 w-10 rounded object-cover"
-                />
-                <div>
-                  <div className="font-medium">{product.title}</div>
-                  <div className="text-muted-foreground text-xs max-w-xs truncate">
-                    {product.description}
+    <div className="space-y-4">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Product</TableHead>
+            <TableHead>Brand</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead className="text-right">Price</TableHead>
+            <TableHead className="text-right">Stock</TableHead>
+            <TableHead className="text-right">Rating</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {paginatedProducts.map((product) => (
+            <TableRow key={product.id}>
+              <TableCell className="font-medium">{product.id}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={product.thumbnail}
+                    alt={product.title}
+                    className="h-10 w-10 rounded object-cover"
+                  />
+                  <div>
+                    <div className="font-medium">{product.title}</div>
+                    <div className="text-muted-foreground text-xs max-w-xs truncate">
+                      {product.description}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </TableCell>
-            <TableCell>{product.brand || "N/A"}</TableCell>
-            <TableCell>
-              <Badge variant="secondary">{product.category}</Badge>
-            </TableCell>
-            <TableCell className="text-right">
-              ${product.price.toFixed(2)}
-            </TableCell>
-            <TableCell className="text-right">
-              <span
-                className={
-                  product.stock < 10
-                    ? "text-red-500 font-medium"
-                    : "text-green-600"
-                }
-              >
-                {product.stock}
-              </span>
-            </TableCell>
-            <TableCell className="text-right">
-              <span className="inline-flex items-center gap-1">
-                ⭐ {product.rating.toFixed(1)}
-              </span>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+              </TableCell>
+              <TableCell>{product.brand || "N/A"}</TableCell>
+              <TableCell>
+                <Badge variant="secondary">{product.category}</Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                ${product.price.toFixed(2)}
+              </TableCell>
+              <TableCell className="text-right">
+                <span
+                  className={
+                    product.stock < 10
+                      ? "text-red-500 font-medium"
+                      : "text-green-600"
+                  }
+                >
+                  {product.stock}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <span className="inline-flex items-center gap-1">
+                  ⭐ {product.rating.toFixed(1)}
+                </span>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>
+            Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of{" "}
+            {totalItems} products
+          </span>
+          <span className="mx-2">|</span>
+          <span>Rows per page:</span>
+          <select
+            value={pageSize}
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            className="border rounded px-2 py-1 bg-background"
+          >
+            {PAGE_SIZE_OPTIONS.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => goToPage(1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          <span className="px-4 text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => goToPage(totalPages)}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
