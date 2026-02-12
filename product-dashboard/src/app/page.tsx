@@ -1,4 +1,5 @@
 import { ProductsTable } from "@/components/products-table";
+import { MetricsCards } from "@/components/metrics-cards";
 
 export default function Home() {
   return (
@@ -12,6 +13,11 @@ export default function Home() {
             Browse all available products from the catalog.
           </p>
         </div>
+
+        <div className="mb-8">
+          <MetricsCards />
+        </div>
+
         <div className="rounded-lg border bg-white dark:bg-zinc-900 p-4">
           <ProductsTable />
         </div>
