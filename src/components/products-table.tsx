@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Table,
   TableBody,
@@ -78,13 +79,15 @@ interface ProductsTableProps {
 }
 
 export function ProductsTable({ category }: ProductsTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pagination, setPagination] = useState({ page: 1, size: 10, category });
 
   // Reset to page 1 when category changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [category]);
+  const currentPage = pagination.category === category ? pagination.page : 1;
+  const pageSize = pagination.size;
+
+  if (pagination.category !== category) {
+    setPagination({ page: 1, size: pagination.size, category });
+  }
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["products", category],
@@ -113,12 +116,11 @@ export function ProductsTable({ category }: ProductsTableProps) {
   const paginatedProducts = products.slice(startIndex, endIndex);
 
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    setPagination({ ...pagination, page: Math.max(1, Math.min(page, totalPages)), category });
   };
 
   const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setPagination({ page: 1, size: newSize, category });
   };
 
   return (
@@ -148,9 +150,11 @@ export function ProductsTable({ category }: ProductsTableProps) {
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <img
+                  <Image
                     src={product.thumbnail}
                     alt={product.title}
+                    width={40}
+                    height={40}
                     className="h-10 w-10 rounded object-cover"
                   />
                   <div>

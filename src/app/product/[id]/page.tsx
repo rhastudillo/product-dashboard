@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -94,9 +95,11 @@ export default function ProductPage() {
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Product Image */}
           <div className="rounded-lg border bg-white dark:bg-zinc-900 p-4">
-            <img
+            <Image
               src={product.thumbnail}
               alt={product.title}
+              width={500}
+              height={500}
               className="w-full h-auto rounded-lg object-cover aspect-square"
             />
           </div>

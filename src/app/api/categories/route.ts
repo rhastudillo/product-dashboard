@@ -5,7 +5,7 @@ export async function GET() {
     const response = await fetch("https://dummyjson.com/products/categories");
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch categories" },
       { status: 500 }
