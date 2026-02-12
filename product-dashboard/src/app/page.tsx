@@ -1,7 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import { ProductsTable } from "@/components/products-table";
 import { MetricsCards } from "@/components/metrics-cards";
+import { CategoryFilter } from "@/components/category-filter";
 
 export default function Home() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   return (
     <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
       <main className="container mx-auto py-10 px-4">
@@ -15,11 +21,18 @@ export default function Home() {
         </div>
 
         <div className="mb-8">
-          <MetricsCards />
+          <MetricsCards category={selectedCategory} />
+        </div>
+
+        <div className="mb-4">
+          <CategoryFilter
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
         </div>
 
         <div className="rounded-lg border bg-white dark:bg-zinc-900 p-4">
-          <ProductsTable />
+          <ProductsTable category={selectedCategory} />
         </div>
       </main>
     </div>

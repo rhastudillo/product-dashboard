@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Table,
@@ -19,19 +19,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
-
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  discountPercentage: number;
-  rating: number;
-  stock: number;
-  brand: string;
-  category: string;
-  thumbnail: string;
-}
+import { Product } from "@/lib/product-utils";
 
 interface ProductsResponse {
   products: Product[];
@@ -42,8 +30,11 @@ interface ProductsResponse {
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
-async function fetchProducts(): Promise<ProductsResponse> {
-  const response = await fetch("/api/products");
+async function fetchProducts(category: string | null): Promise<ProductsResponse> {
+  const url = category
+    ? `/api/products?category=${encodeURIComponent(category)}`
+    : "/api/products";
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch products");
   }
@@ -81,13 +72,22 @@ function TableSkeleton() {
   );
 }
 
-export function ProductsTable() {
+interface ProductsTableProps {
+  category: string | null;
+}
+
+export function ProductsTable({ category }: ProductsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // Reset to page 1 when category changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category]);
+
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryKey: ["products", category],
+    queryFn: () => fetchProducts(category),
   });
 
   if (isLoading) {

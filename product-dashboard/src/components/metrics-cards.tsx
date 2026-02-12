@@ -13,8 +13,11 @@ interface ProductsResponse {
   limit: number;
 }
 
-async function fetchProducts(): Promise<ProductsResponse> {
-  const response = await fetch("/api/products");
+async function fetchProducts(category: string | null): Promise<ProductsResponse> {
+  const url = category
+    ? `/api/products?category=${encodeURIComponent(category)}`
+    : "/api/products";
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Failed to fetch products");
   }
@@ -36,10 +39,14 @@ function MetricCardSkeleton() {
   );
 }
 
-export function MetricsCards() {
+interface MetricsCardsProps {
+  category: string | null;
+}
+
+export function MetricsCards({ category }: MetricsCardsProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryKey: ["products", category],
+    queryFn: () => fetchProducts(category),
   });
 
   if (isLoading) {
