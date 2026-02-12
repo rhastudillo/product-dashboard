@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -137,7 +138,14 @@ export function ProductsTable({ category }: ProductsTableProps) {
         <TableBody>
           {paginatedProducts.map((product) => (
             <TableRow key={product.id}>
-              <TableCell className="font-medium">{product.id}</TableCell>
+              <TableCell className="font-medium">
+                <Link
+                  href={`/product/${product.id}`}
+                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {product.id}
+                </Link>
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-3">
                   <img
