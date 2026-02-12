@@ -102,41 +102,4 @@ The category filter:
 
 This creates a cohesive experience where the metrics card insights can be explored further through filtering.
 
----
 
-## User Flow
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    DASHBOARD                            │
-│                                                         │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
-│  │ Avg Price   │ │ Low Stock   │ │    Top      │       │
-│  │   $100      │ │ High Rated  │ │ Categories  │       │
-│  └─────────────┘ └─────────────┘ └─────────────┘       │
-│                         ↓                               │
-│              [ Category Filter ]                        │
-│                         ↓                               │
-│  ┌─────────────────────────────────────────────┐       │
-│  │ ID │ Product │ Brand │ Category │ Price... │       │
-│  │ 1  │ ...     │ ...   │ ...      │ ...      │  →    │
-│  │ 2  │ ...     │ ...   │ ...      │ ...      │       │
-│  └─────────────────────────────────────────────┘       │
-│              [ Pagination Controls ]                    │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          │ Click ID
-                          ↓
-┌─────────────────────────────────────────────────────────┐
-│                  PRODUCT DETAIL                         │
-│  ← Back                                                 │
-│                                                         │
-│  ┌──────────┐  Title                                   │
-│  │  Image   │  Description                             │
-│  │          │  ┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐│
-│  └──────────┘  │ Price │ │Rating │ │ Stock │ │  ID   ││
-│                └───────┘ └───────┘ └───────┘ └───────┘│
-└─────────────────────────────────────────────────────────┘
-```
-
-This hierarchy ensures users always know where they are and can navigate efficiently between overview and detail views.
