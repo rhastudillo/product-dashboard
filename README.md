@@ -1,3 +1,11 @@
+# Product Dashboard
+
+A simple product dashboard using the [dummyjson API](https://dummyjson.com/products) to display products with metrics, filtering, and pagination.
+
+**Live Demo:** [https://product-dashboard-liart.vercel.app/](https://product-dashboard-liart.vercel.app/)
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
